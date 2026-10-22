@@ -291,18 +291,17 @@
   }
 
   // The Wi-Fi way is better (the phone can fetch the channels a browser can't), so if this computer can
-  // reach the phone directly, hop to the page the phone serves. Browsers mostly block an https page from
-  // touching http on the local network; then this quietly fails and we stay on the internet way.
+  // reach the phone directly, hop to the page the phone serves. Chrome and Brave ask the user first
+  // ("access devices on your local network"); refused, blocked or unreachable, we stay on the internet way.
   function tryLan() {
     if (lanTried || !lanUrl) return;
     lanTried = true;
-    const u = new URL(lanUrl), ctl = new AbortController();
-    const timer = setTimeout(() => ctl.abort(), 2500);
+    const u = new URL(lanUrl);
     const space = /^(127\.|localhost$|\[::1\]$)/.test(u.hostname) ? 'loopback' : 'local'; // Local Network Access: say where we're going
-    fetch(u.origin + '/check?k=' + encodeURIComponent(u.searchParams.get('k') || ''), { signal: ctl.signal, targetAddressSpace: space, cache: 'no-store' })
-      .then(r => r.ok ? r.text() : Promise.reject(r.status))
-      .then(t => { clearTimeout(timer); if (/^ok /.test(t)) { if (link) link.bye(); location.href = lanUrl; } })
-      .catch(() => clearTimeout(timer));
+    fetch(u.origin + '/check?k=' + encodeURIComponent(u.searchParams.get('k') || ''), { targetAddressSpace: space, cache: 'no-store' })
+      .then(r => r.ok ? r.text() : Promise.reject(r.status)) // no time limit: the browser may be asking the user first
+      .then(t => { if (/^ok /.test(t)) { if (link) link.bye(); location.href = lanUrl; } })
+      .catch(() => {});
   }
   function showPair(text) {
     $('pair').style.display = 'flex';
