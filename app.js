@@ -298,7 +298,8 @@
     lanTried = true;
     const u = new URL(lanUrl), ctl = new AbortController();
     const timer = setTimeout(() => ctl.abort(), 2500);
-    fetch(u.origin + '/check?k=' + encodeURIComponent(u.searchParams.get('k') || ''), { signal: ctl.signal, targetAddressSpace: 'local', cache: 'no-store' })
+    const space = /^(127\.|localhost$|\[::1\]$)/.test(u.hostname) ? 'loopback' : 'local'; // Local Network Access: say where we're going
+    fetch(u.origin + '/check?k=' + encodeURIComponent(u.searchParams.get('k') || ''), { signal: ctl.signal, targetAddressSpace: space, cache: 'no-store' })
       .then(r => r.ok ? r.text() : Promise.reject(r.status))
       .then(t => { clearTimeout(timer); if (/^ok /.test(t)) { if (link) link.bye(); location.href = lanUrl; } })
       .catch(() => clearTimeout(timer));

@@ -4,7 +4,7 @@
 // are made in this browser and kept in its localStorage.
 (function () {
   'use strict';
-  const RELAYS = ['wss://nos.lol', 'wss://relay.primal.net', 'wss://nostr.mom', 'wss://offchain.pub'];
+  const RELAYS = ['wss://nos.lol', 'wss://relay.primal.net', 'wss://nostr.mom', 'wss://relay.snort.social', 'wss://relay.nostr.net'];
   const KIND_MSG = 23377, KIND_OFFER = 23378;
   const enc = new TextEncoder(), dec = new TextDecoder();
 
