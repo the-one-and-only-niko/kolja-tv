@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KÖLJA TV-14</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #0b0907; color: #e9dcc0; font-family: "Helvetica Neue", Arial, sans-serif; overflow: hidden; }
+  #room { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+          background: radial-gradient(ellipse at 50% 40%, #2a2017 0%, #0b0907 70%); }
+  /* the set: wood cabinet, cream bezel, glass */
+  #cab { position: relative; width: min(94vw, calc(90vh * 1.36)); aspect-ratio: 1.36; padding: 3.2% 3.2% 9% 3.2%;
+         border-radius: 3.2% / 4%; background:
+           repeating-linear-gradient(92deg, rgba(0,0,0,.10) 0 2px, transparent 2px 9px),
+           repeating-linear-gradient(88deg, rgba(255,220,170,.05) 0 1px, transparent 1px 13px),
+           linear-gradient(180deg, #7a4a26, #5b3317 55%, #3f220e);
+         box-shadow: 0 30px 80px rgba(0,0,0,.7), inset 0 2px 0 rgba(255,220,180,.25), inset 0 -6px 14px rgba(0,0,0,.5); }
+  #bezel { position: relative; width: 100%; height: 100%; border-radius: 2.6% / 3.4%; padding: 2.4%;
+           background: linear-gradient(180deg, #efe4cc, #cdb995); box-shadow: inset 0 2px 6px rgba(0,0,0,.35); }
+  #brand { position: absolute; left: 4.5%; bottom: 2.6%; font: 700 clamp(12px, 2.2vw, 30px) "Helvetica Neue", Arial, sans-serif;
+           letter-spacing: .28em; color: #e8d5ae; text-shadow: 0 1px 0 rgba(0,0,0,.6); }
+  #model { position: absolute; right: 4.5%; bottom: 3.1%; font: 700 clamp(8px, 1vw, 14px) "Helvetica Neue", Arial, sans-serif;
+           letter-spacing: .16em; color: #c9ab7a; display: flex; align-items: center; gap: .9em; }
+  #lamp { flex: none; width: .9vw; height: .9vw; min-width: 7px; min-height: 7px; border-radius: 50%;
+          background: #3a1c0c; box-shadow: inset 0 1px 2px rgba(0,0,0,.6); }
+  #lamp.on { background: radial-gradient(circle at 40% 35%, #ffd8a0, #ff7a1a 60%, #a33a00); box-shadow: 0 0 10px #ff8a2a; }
+  #glass { position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: 6% / 8%; background: #050605;
+           box-shadow: inset 0 0 40px rgba(0,0,0,.9); }
+  body.full #cab { width: 100vw; height: 100vh; aspect-ratio: auto; padding: 0; border-radius: 0; background: #000; box-shadow: none; }
+  body.full #bezel { padding: 0; border-radius: 0; background: #000; box-shadow: none; }
+  body.full #brand, body.full #model, body.full #lamp { display: none; }
+  body.full #glass { border-radius: 0; }
+  #screen { position: absolute; inset: 0; transform-origin: 50% 50%; }
+  video, #static { position: absolute; inset: 0; width: 100%; height: 100%; }
+  video { object-fit: contain; background: #000; }
+  #static { image-rendering: pixelated; opacity: 0; transition: opacity .25s; }
+  #static.on { opacity: 1; transition: none; }
+  .roll video { animation: roll .45s ease-out; }
+  @keyframes roll { 0% { transform: translateY(-14%); filter: brightness(1.8); } 60% { transform: translateY(3%); } 100% { transform: none; } }
+  .flip #screen { animation: flip .28s ease-in-out; }
+  @keyframes flip { 0% { transform: none; } 45% { transform: scaleY(.012); filter: brightness(3); } 100% { transform: none; } }
+  #screen.off { animation: off .55s ease-in forwards; }
+  @keyframes off { 0% { transform: none; } 45% { transform: scale(1, .006); filter: brightness(4); } 80% { transform: scale(.012, .006); filter: brightness(6); } 100% { transform: scale(0, 0); } }
+  #screen.warm { animation: warm 1.5s ease-out; }
+  @keyframes warm { 0% { transform: scale(1, .006); filter: brightness(4); } 20% { transform: none; filter: brightness(.18); } 100% { transform: none; filter: brightness(1); } }
+  #dot { position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px; border-radius: 50%; background: #fff;
+         box-shadow: 0 0 18px 6px rgba(200,230,255,.8); opacity: 0; }
+  #dot.fade { animation: dot 1.6s ease-out .45s; }
+  @keyframes dot { 0% { opacity: 1; } 100% { opacity: 0; } }
+  /* CRT layers */
+  #crt { position: absolute; inset: 0; pointer-events: none; }
+  .crt1 #crt { background:
+      radial-gradient(ellipse at 50% 50%, transparent 58%, rgba(0,0,0,.55) 100%),
+      repeating-linear-gradient(180deg, rgba(0,0,0,.20) 0 1px, transparent 1px 3px); }
+  .crt2 #crt { background:
+      radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(0,0,0,.72) 100%),
+      repeating-linear-gradient(180deg, rgba(0,0,0,.34) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(90deg, rgba(255,40,40,.07) 0 1px, rgba(40,255,40,.07) 1px 2px, rgba(40,90,255,.07) 2px 3px);
+      animation: flick 3.5s infinite steps(1); }
+  .crt2 video { filter: saturate(1.3) contrast(1.12) blur(.5px); }
+  .crt2 #glass { border-radius: 9% / 12%; }
+  @keyframes flick { 0% { opacity: 1; } 50% { opacity: .93; } 51% { opacity: 1; } 87% { opacity: .96; } }
+  #shine { position: absolute; inset: 0; pointer-events: none;
+           background: linear-gradient(135deg, rgba(255,255,255,.09) 0%, rgba(255,255,255,.02) 28%, transparent 40%); }
+  .crt0 #shine { display: none; }
+  /* OSD in phosphor green */
+  .osd { position: absolute; pointer-events: none; color: #6dff7a; font-family: "Courier New", Courier, monospace; font-weight: 700;
+         text-shadow: 0 0 6px rgba(80,255,110,.8), 2px 2px 0 rgba(0,0,0,.8); transition: opacity .4s; }
+  #num { right: 6%; top: 6%; font-size: clamp(22px, 6vw, 84px); letter-spacing: .05em; }
+  #bar { left: 6%; right: 6%; bottom: 7%; font-size: clamp(12px, 2.2vw, 32px); display: flex; justify-content: space-between; gap: 2em; }
+  #bar .n { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  #msg { left: 0; right: 0; top: 45%; text-align: center; font-size: clamp(16px, 3.4vw, 46px); }
+  .hide { opacity: 0; }
+  #menu { position: absolute; left: 10%; right: 10%; top: 10%; bottom: 10%; padding: 2.5% 4%; background: rgba(0,10,2,.78);
+          border: 2px solid rgba(110,255,122,.6); display: none; flex-direction: column; font-size: clamp(12px, 2vw, 28px); }
+  #menu.on { display: flex; }
+  #menu h2 { margin: 0 0 .5em; font-size: 1.15em; letter-spacing: .12em; border-bottom: 2px solid rgba(110,255,122,.5); padding-bottom: .3em; }
+  #menu div { padding: .12em .4em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #menu div.sel { background: #6dff7a; color: #031a06; text-shadow: none; }
+  /* overlays on the page itself */
+  .panel { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(5,4,3,.82); z-index: 5; }
+  .panel .box { text-align: center; padding: 34px 44px; border-radius: 18px; background: #1d1610; border: 1px solid #5a4630;
+                box-shadow: 0 20px 60px rgba(0,0,0,.6); max-width: 90vw; }
+  .panel h1 { margin: 0 0 10px; font-size: 26px; letter-spacing: .2em; color: #f0dfbd; }
+  .panel p { margin: 8px 0 18px; color: #bca988; font-size: 16px; }
+  .panel input { font: 700 30px "Courier New", monospace; letter-spacing: .35em; text-transform: uppercase; width: 8.5em; text-align: center;
+                 padding: 8px; border-radius: 10px; border: 2px solid #6b5338; background: #0d0a07; color: #6dff7a; }
+  .panel button { margin-top: 16px; font: 700 18px "Helvetica Neue", Arial, sans-serif; letter-spacing: .12em; padding: 12px 26px;
+                  border-radius: 999px; border: 0; background: #e4cfa6; color: #2a1d10; cursor: pointer; }
+  #power { cursor: pointer; }
+  #power .knob { width: 90px; height: 90px; margin: 4px auto 14px; border-radius: 50%; border: 4px solid #a99c86;
+                 background: radial-gradient(circle at 35% 30%, #4e3b25, #160f08 70%); box-shadow: 0 6px 18px rgba(0,0,0,.6); position: relative; }
+  #power .knob::after { content: ""; position: absolute; left: 50%; top: 10px; width: 8px; height: 26px; margin-left: -4px; border-radius: 4px; background: #f2e3c2; }
+  #help { position: fixed; right: 14px; bottom: 10px; font-size: 12px; color: #6b5a44; letter-spacing: .05em; }
+  body.full #help { display: none; }
+  #net { position: fixed; left: 14px; bottom: 10px; font-size: 12px; color: #a85a3a; letter-spacing: .05em; }
+  #net a { color: #e4cfa6; }
+  #mode { position: fixed; left: 14px; top: 10px; font-size: 11px; color: #6b8a5a; letter-spacing: .14em; font-weight: 700; }
+  body.full #mode { display: none; }
+</style>
+</head>
+<body class="crt1">
+<div id="room">
+  <div id="cab">
+    <div id="bezel">
+      <div id="glass">
+        <div id="screen">
+          <video id="v" playsinline muted></video>
+          <canvas id="static" width="240" height="180"></canvas>
+        </div>
+        <div id="dot"></div>
+        <div id="num" class="osd hide"></div>
+        <div id="bar" class="osd hide"><span class="n" id="name"></span><span id="where"></span></div>
+        <div id="msg" class="osd hide"></div>
+        <div id="menu" class="osd"></div>
+        <div id="crt"></div><!-- over the OSD too: the menu is drawn by the same tube -->
+        <div id="shine"></div>
+      </div>
+    </div>
+    <div id="brand">KÖLJA</div>
+    <div id="model"><span id="lamp"></span>TV-14 · COLOUR</div>
+  </div>
+</div>
+<div id="pair" class="panel" style="display:none"><div class="box">
+  <h1>KÖLJA TV-14</h1>
+  <p id="pairText">Type the 6-letter code shown on your phone</p>
+  <input id="code" maxlength="6" autocomplete="off" spellcheck="false"><br>
+  <button id="pairGo">CONNECT</button>
+</div></div>
+<div id="power" class="panel" style="display:none"><div class="box">
+  <div class="knob"></div>
+  <h1 id="powerText">CLICK TO TURN ON THE TV</h1>
+  <p id="powerSub">Your phone is the remote. Keys work here too: ↑↓ channel, ←→ volume, M menu, F full screen.</p>
+</div></div>
+<div id="net"></div>
+<div id="mode"></div>
+<div id="help">F · full screen &nbsp; C · picture &nbsp; M · menu</div>
+<script src="hls.min.js"></script>
+<script src="net.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
